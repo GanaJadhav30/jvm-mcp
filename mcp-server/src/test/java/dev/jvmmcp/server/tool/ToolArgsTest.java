@@ -132,6 +132,44 @@ class ToolArgsTest {
     }
 
     @Test
+    @DisplayName("getStringArg allows null for optional arguments")
+    void testGetStringArgOptionalNullValue() {
+        Map<String, Object> args = new HashMap<>();
+        args.put("url", null);
+
+        assertThat(ToolArgs.getStringArg(args, "url", false)).isNull();
+    }
+
+    @Test
+    @DisplayName("getStringArg allows blank optional arguments")
+    void testGetStringArgOptionalBlankValue() {
+        Map<String, Object> args = Map.of("url", "   ");
+
+        assertThat(ToolArgs.getStringArg(args, "url", false)).isEqualTo("   ");
+    }
+
+    @Test
+    @DisplayName("getStringArg rejects null for required arguments")
+    void testGetStringArgRequiredNullValue() {
+        Map<String, Object> args = new HashMap<>();
+        args.put("url", null);
+
+        assertThatThrownBy(() -> ToolArgs.getStringArg(args, "url", true))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Missing required argument: url");
+    }
+
+    @Test
+    @DisplayName("getStringArg rejects blank strings for required arguments")
+    void testGetStringArgRequiredBlankValue() {
+        Map<String, Object> args = Map.of("url", " ");
+
+        assertThatThrownBy(() -> ToolArgs.getStringArg(args, "url", true))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Argument 'url' cannot be blank");
+    }
+
+    @Test
     @DisplayName("getLongArg returns zero for null optional arguments")
     void testGetLongArgNullOptionalValue() {
         Map<String, Object> args = new HashMap<>();
@@ -196,5 +234,4 @@ class ToolArgsTest {
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("Argument 'enabled' must be a boolean");
     }
-
 }
